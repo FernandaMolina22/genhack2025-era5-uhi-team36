@@ -1,4 +1,4 @@
-# ERA5 Bias in Tmax — From Diagnosis to Action 
+# ERA5 Bias in Tmax — From Diagnosis to Action
 _codellera andina — December 2025_
 
 > **Purpose.** Turn a clear **ERA5 cold-bias diagnosis** into a **transparent, physics-based correction**, using only interpretable drivers (vegetation, urbanization, distance to sea, wind, rain).
@@ -15,7 +15,7 @@ _codellera andina — December 2025_
 7. [Operational Correction & Deployment](#operational-correction--deployment)  
 8. [Sensitivity, Limitations, Next Steps](#sensitivity-limitations-next-steps)  
 9. [Repository Structure](#repository-structure)  
-10. [Selected Code Snippets](#selected-code-snippets)
+10. [Code Snippets](#selected-code-snippets)
 ---
 
 ## Executive Summary
@@ -82,7 +82,7 @@ $$
 **Distance categories:**
 
 $$
-\boxed{\text{dist\_cat} = \begin{cases}
+\boxed{\text{dist\\_cat} = \begin{cases}
 \text{< 10 km}, & d < 10 \\
 \text{10–50 km}, & 10 \le d \le 50 \\
 \text{> 50 km}, & d > 50
@@ -100,7 +100,7 @@ $$
 $$
 \boxed{\text{dry}:\; \text{precip} = 0,\quad
 \text{wet}:\; \text{precip} > 0,\quad
-\text{heavy\_rain}:\; \text{precip} \ge P_{90}(\text{precip}\mid \text{precip}>0).}$$
+\text{heavy\\_rain}:\; \text{precip} \ge P_{90}(\text{precip}\mid \text{precip}>0).}$$
 
 ### Summary findings (from station/daily diagnostics)
 - **Coast:** **<10 km → ~–2.2 °C** underestimation; **>50 km → ~+0.3 °C** (slightly positive).  
@@ -186,7 +186,7 @@ Each period folder contains:
 - The **video**
 - A local **README.md** summarizing the period
 
-## Selected Code Snippets
+## Code Snippets
 
 ### Load & derive error
 ```python
