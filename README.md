@@ -1,5 +1,5 @@
 # ERA5 Bias in Tmax — From Diagnosis to Action (Full Technical Report)
-Team 36 - Codellera andina — December 2025_
+_codellera andina — December 2025_
 
 > **Purpose.** Turn a clear **ERA5 cold-bias diagnosis** into a **transparent, physics-based correction**, using only interpretable drivers (vegetation, urbanization, distance to sea, wind, rain).
 
@@ -15,9 +15,7 @@ Team 36 - Codellera andina — December 2025_
 7. [Operational Correction & Deployment](#operational-correction--deployment)  
 8. [Sensitivity, Limitations, Next Steps](#sensitivity-limitations-next-steps)  
 9. [Repository Structure](#repository-structure)  
-10. [Image Placement Guide](#image-placement-guide)  
-11. [Selected Code Snippets](#selected-code-snippets)
-
+10. [Selected Code Snippets](#selected-code-snippets)
 ---
 
 ## Executive Summary
@@ -27,10 +25,11 @@ Team 36 - Codellera andina — December 2025_
 - **Generalization:** **LOO RMSE ≈ 1.578 °C**.  
 - **Standardized coefficients:** distance to sea **+0.965**, wind speed **+0.369**, vegetation (1–NDVI) **–0.299**.  
 - **Correction formula:**  
-  $$\boxed{T_{\text{adjusted}} = T_{\text{ERA5}} - \widehat{\text{bias}}}$$
-- **So‑what:** Retain ERA5’s spatial patterns while delivering **decision-ready temperatures**.
 
-**PLACE IMAGE (SEASONAL OVERVIEW):** UPPERCASE → **INSERT "ADD_SEASONAL_BOX_PLOT_IMAGE_HERE" HERE**
+$$
+\boxed{T_{\text{adjusted}} = T_{\text{ERA5}} - \widehat{\text{bias}}}$$
+
+- **So‑what:** Retain ERA5’s spatial patterns while delivering **decision-ready temperatures**.
 
 ---
 
@@ -40,9 +39,7 @@ Team 36 - Codellera andina — December 2025_
 - Build a **simple regression model** to explain the bias.  
 - Communicate insights through visuals, metrics, and a clear narrative.
 
-
 ## Data & Preprocessing
-
 
 ### Station Selection
 We selected **12 stations** across Central Italy, evenly distributed across rural/urban and coastal/interior environments, to study how land cover and geography influence the ERA5 cold bias.
@@ -54,20 +51,26 @@ We selected **12 stations** across Central Italy, evenly distributed across rura
 
 ### Core definitions
 Let $y$ be station Tmax and $\tilde y$ ERA5 Tmax. Define **daily error**:  
+
 $$
 \text{error}_t = \tilde y_t - y_t.
+
 $$
 
 Aggregate to **station × season** (for season $s$ at station $i$):  
+
 $$
 \overline{\text{bias}}_{i,s} = \frac{1}{n_{i,s}}\sum_{t\in (i,s)} \text{error}_t.
+
 $$
 
 **Metrics** used throughout (for a set $\mathcal{E}$ of errors):
+
 $$
 \mu = \frac{1}{n}\sum_{e\in\mathcal E} e,\quad
 \sigma = \sqrt{\frac{1}{n-1}\sum_{e\in\mathcal E}(e-\mu)^2},\quad
 \mathrm{RMSE} = \sqrt{\frac{1}{n}\sum_{e\in\mathcal E} e^2}.
+
 $$
 
 ### Feature construction (daily → seasonal)
@@ -75,9 +78,7 @@ $$
 - **NDVI:** seasonal mean.  
 - **Urbanization:** env_class or urban fraction.  
 - **Wind:** seasonal mean WS; optional regimes (cardinal).  
-- **Rain:** seasonal frequency $\mathbb 1(\text{precip} > 0)$.
-
-**PLACE IMAGE (URBAN/ENV EXAMPLE):** UPPERCASE → **INSERT "ADD_URBAN_ENV_IMAGE_HERE" HERE**
+- **Rain:** seasonal frequency $\mathbb{1}(\text{precip} > 0)$.
 
 ---
 
@@ -85,26 +86,32 @@ $$
 
 ### Binning schemes
 **Distance categories:**
+
 $$
 \text{dist\_cat} = \begin{cases}
 \text{< 10 km}, & d < 10 \\
 \text{10–50 km}, & 10 \le d \le 50 \\
 \text{> 50 km}, & d > 50
 \end{cases}
+
 $$
 
 **Wind speed categories:** with seasonal percentiles $P_{25}, P_{75}$ of WS,
+
 $$
 \text{weak}:\; \text{WS} < P_{25},\quad
 \text{medium}: P_{25} \le \text{WS} \le P_{75},\quad
 \text{strong}: \text{WS} > P_{75}.
+
 $$
 
 **Rain categories:**
+
 $$
 \text{dry}:\; \text{precip} = 0,\quad
 \text{wet}:\; \text{precip} > 0,\quad
 \text{heavy\_rain}:\; \text{precip} \ge P_{90}(\text{precip}\mid \text{precip}>0).
+
 $$
 
 ### Summary findings (from station/daily diagnostics)
@@ -113,34 +120,33 @@ $$
 - **Rain:** wet/heavy-rain days **reduce** cold bias.  
 - **NDVI:** **low NDVI → –2 to –3 °C errors**; greener = smaller bias; Reggio Calabria: NDVI declines align with **hotter zones/UHI**.
 
-**PLACE IMAGE (DISTANCE-TO-SEA BOX OR SCATTER):** UPPERCASE → **INSERT "ADD_DISTANCE_TO_SEA_IMAGE_HERE" HERE**  
-**PLACE IMAGE (NDVI RELATIONSHIP):** UPPERCASE → **INSERT "ADD_NDVI_IMAGE_HERE" HERE**  
-**PLACE IMAGE (WIND CATEGORIES / REGIMES):** UPPERCASE → **INSERT "ADD_WIND_IMAGE_HERE" HERE**  
-**PLACE IMAGE (RAIN STATES):** UPPERCASE → **INSERT "ADD_RAIN_IMAGE_HERE" HERE**
-
 ---
 
 ## Modeling Framework
 
 ### Linear model
 Let the station-season bias be $b_{i,s}$. With features $x_{i,s}\in\mathbb R^p$:
+
 $$
 b_{i,s} = \beta_0 + \sum_{j=1}^p \beta_j x_{i,s,j} + \varepsilon_{i,s},\quad \varepsilon_{i,s}\sim\text{i.i.d.}
+
 $$
 
 **Standardization** for interpretability:  
+
 $$
 x'_j = \frac{x_j - \mu_j}{\sigma_j},\quad \beta_j^{(std)} = \beta_j \cdot \sigma_j.
+
 $$
 
 **Group cross‑validation by station** (LOO): each fold holds out all seasons for one station to test generalization to unseen locations.
 
 **Bias correction:** for any ERA5 Tmax:  
+
 $$
 \boxed{\;T^{\text{adjusted}} = T^{\text{ERA5}} - \widehat b(x)\;}
-$$
 
-**PLACE IMAGE (MODEL COEFFICIENTS BAR):** UPPERCASE → **INSERT "ADD_MODEL_COEFFICIENTS_IMAGE_HERE" HERE**
+$$
 
 ---
 
@@ -157,15 +163,15 @@ $$
 ### Physical read‑out
 The cold bias intensifies where **sub‑grid surface energy balance** dominates (coastal boundary layers, vegetated surfaces with strong ET). **Wind** and **inland fetch** mitigate this by mixing and reducing decoupling.
 
-**PLACE IMAGE (STATION MEAN ERROR VS DISTANCE):** UPPERCASE → **INSERT "ADD_SCATTER_IMAGE_HERE" HERE**
-
 ---
 
 ## Operational Correction & Deployment
 
 ### Formula
+
 $$
 T^{\text{adjusted}} = T^{\text{ERA5}} - \widehat b\!\left(x_{\text{NDVI}},\;x_{\text{urban}},\;\log(1+d),\;\text{WS},\;\text{rain}\right).
+
 $$
 
 ### Deployment checklist
@@ -186,7 +192,6 @@ $$
 
 ---
 
-
 ## Repository Structure
 The repository follows the four official hackathon periods:
 ```text
@@ -200,18 +205,6 @@ Each period folder contains:
 - The **slides** for that week
 - The **video**
 - A local **README.md** summarizing the period
-
-## Image Placement Guide
-- EXECUTIVE OVERVIEW (SEASONAL BOX PLOT): **INSERT "ADD_SEASONAL_BOX_PLOT_IMAGE_HERE"**  
-- DISTANCE‑TO‑SEA (BOX/SCATTER): **INSERT "ADD_DISTANCE_TO_SEA_IMAGE_HERE"**  
-- NDVI RELATIONSHIP: **INSERT "ADD_NDVI_IMAGE_HERE"**  
-- WIND CATEGORIES / REGIMES: **INSERT "ADD_WIND_IMAGE_HERE"**  
-- RAIN STATES: **INSERT "ADD_RAIN_IMAGE_HERE"**  
-- URBAN VS RURAL: **INSERT "ADD_URBAN_ENV_IMAGE_HERE"**  
-- MODEL COEFFICIENTS: **INSERT "ADD_MODEL_COEFFICIENTS_IMAGE_HERE"**  
-- STATION MEAN ERROR VS DISTANCE: **INSERT "ADD_SCATTER_IMAGE_HERE"**
-
----
 
 ## Selected Code Snippets
 
