@@ -1,4 +1,4 @@
-# ERA5 Bias in Tmax — From Diagnosis to Action (Full Technical Report)
+# ERA5 Bias in Tmax — From Diagnosis to Action
 _codellera andina — December 2025_
 
 > **Purpose.** Turn a clear **ERA5 cold-bias diagnosis** into a **transparent, physics-based correction**, using only interpretable drivers (vegetation, urbanization, distance to sea, wind, rain).
