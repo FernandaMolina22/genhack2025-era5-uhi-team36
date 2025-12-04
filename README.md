@@ -1,4 +1,4 @@
-# ERA5 Bias in Tmax — From Diagnosis to Action
+# ERA5 Bias in Tmax — From Diagnosis to Action 
 _codellera andina — December 2025_
 
 > **Purpose.** Turn a clear **ERA5 cold-bias diagnosis** into a **transparent, physics-based correction**, using only interpretable drivers (vegetation, urbanization, distance to sea, wind, rain).
@@ -53,25 +53,19 @@ We selected **12 stations** across Central Italy, evenly distributed across rura
 Let $y$ be station Tmax and $\tilde y$ ERA5 Tmax. Define **daily error**:  
 
 $$
-\text{error}_t = \tilde y_t - y_t.
-
-$$
+\boxed{\text{error}_t = \tilde y_t - y_t.}$$
 
 Aggregate to **station × season** (for season $s$ at station $i$):  
 
 $$
-\overline{\text{bias}}_{i,s} = \frac{1}{n_{i,s}}\sum_{t\in (i,s)} \text{error}_t.
-
-$$
+\boxed{\overline{\text{bias}}_{i,s} = \frac{1}{n_{i,s}}\sum_{t\in (i,s)} \text{error}_t.}$$
 
 **Metrics** used throughout (for a set $\mathcal{E}$ of errors):
 
 $$
-\mu = \frac{1}{n}\sum_{e\in\mathcal E} e,\quad
+\boxed{\mu = \frac{1}{n}\sum_{e\in\mathcal E} e,\quad
 \sigma = \sqrt{\frac{1}{n-1}\sum_{e\in\mathcal E}(e-\mu)^2},\quad
-\mathrm{RMSE} = \sqrt{\frac{1}{n}\sum_{e\in\mathcal E} e^2}.
-
-$$
+\mathrm{RMSE} = \sqrt{\frac{1}{n}\sum_{e\in\mathcal E} e^2}.}$$
 
 ### Feature construction (daily → seasonal)
 - **Distance to sea:** use $\log(1 + d_{\text{km}})$ to stabilize coastal gradients.  
@@ -88,31 +82,25 @@ $$
 **Distance categories:**
 
 $$
-\text{dist\_cat} = \begin{cases}
+\boxed{\text{dist\_cat} = \begin{cases}
 \text{< 10 km}, & d < 10 \\
 \text{10–50 km}, & 10 \le d \le 50 \\
 \text{> 50 km}, & d > 50
-\end{cases}
-
-$$
+\end{cases}}$$
 
 **Wind speed categories:** with seasonal percentiles $P_{25}, P_{75}$ of WS,
 
 $$
-\text{weak}:\; \text{WS} < P_{25},\quad
+\boxed{\text{weak}:\; \text{WS} < P_{25},\quad
 \text{medium}: P_{25} \le \text{WS} \le P_{75},\quad
-\text{strong}: \text{WS} > P_{75}.
-
-$$
+\text{strong}: \text{WS} > P_{75}.}$$
 
 **Rain categories:**
 
 $$
-\text{dry}:\; \text{precip} = 0,\quad
+\boxed{\text{dry}:\; \text{precip} = 0,\quad
 \text{wet}:\; \text{precip} > 0,\quad
-\text{heavy\_rain}:\; \text{precip} \ge P_{90}(\text{precip}\mid \text{precip}>0).
-
-$$
+\text{heavy\_rain}:\; \text{precip} \ge P_{90}(\text{precip}\mid \text{precip}>0).}$$
 
 ### Summary findings (from station/daily diagnostics)
 - **Coast:** **<10 km → ~–2.2 °C** underestimation; **>50 km → ~+0.3 °C** (slightly positive).  
@@ -128,25 +116,19 @@ $$
 Let the station-season bias be $b_{i,s}$. With features $x_{i,s}\in\mathbb R^p$:
 
 $$
-b_{i,s} = \beta_0 + \sum_{j=1}^p \beta_j x_{i,s,j} + \varepsilon_{i,s},\quad \varepsilon_{i,s}\sim\text{i.i.d.}
-
-$$
+\boxed{b_{i,s} = \beta_0 + \sum_{j=1}^p \beta_j x_{i,s,j} + \varepsilon_{i,s},\quad \varepsilon_{i,s}\sim\text{i.i.d.}}$$
 
 **Standardization** for interpretability:  
 
 $$
-x'_j = \frac{x_j - \mu_j}{\sigma_j},\quad \beta_j^{(std)} = \beta_j \cdot \sigma_j.
-
-$$
+\boxed{x'_j = \frac{x_j - \mu_j}{\sigma_j},\quad \beta_j^{(std)} = \beta_j \cdot \sigma_j.}$$
 
 **Group cross‑validation by station** (LOO): each fold holds out all seasons for one station to test generalization to unseen locations.
 
 **Bias correction:** for any ERA5 Tmax:  
 
 $$
-\boxed{\;T^{\text{adjusted}} = T^{\text{ERA5}} - \widehat b(x)\;}
-
-$$
+\boxed{\;T^{\text{adjusted}} = T^{\text{ERA5}} - \widehat b(x)\;}$$
 
 ---
 
@@ -170,9 +152,7 @@ The cold bias intensifies where **sub‑grid surface energy balance** dominates 
 ### Formula
 
 $$
-T^{\text{adjusted}} = T^{\text{ERA5}} - \widehat b\!\left(x_{\text{NDVI}},\;x_{\text{urban}},\;\log(1+d),\;\text{WS},\;\text{rain}\right).
-
-$$
+\boxed{T^{\text{adjusted}} = T^{\text{ERA5}} - \widehat b\!\left(x_{\text{NDVI}},\;x_{\text{urban}},\;\log(1+d),\;\text{WS},\;\text{rain}\right).}$$
 
 ### Deployment checklist
 1. Build seasonal features: **NDVI**, **env_class/urban fraction**, **log(1+distance_to_sea_km)**, **mean WS**, **rain frequency**.  
